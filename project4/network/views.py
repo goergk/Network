@@ -3,8 +3,8 @@ from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
-
-from .models import User
+from django.contrib.auth.decorators import login_required
+from .models import *
 
 
 def index(request):
@@ -12,7 +12,13 @@ def index(request):
 
 
 def login_view(request):
-    if request.method == "POST":
+    next_page = None
+    try:
+        next_page = request.GET['next']
+    except:
+        print("next is not provided")
+
+    if request.method == "POST":            
 
         # Attempt to sign user in
         username = request.POST["username"]
@@ -22,7 +28,10 @@ def login_view(request):
         # Check if authentication successful
         if user is not None:
             login(request, user)
-            return HttpResponseRedirect(reverse("index"))
+            if next_page is not None:
+                return HttpResponseRedirect(next_page)
+            else:
+                return HttpResponseRedirect(reverse("index"))
         else:
             return render(request, "network/login.html", {
                 "message": "Invalid username and/or password."
@@ -61,3 +70,11 @@ def register(request):
         return HttpResponseRedirect(reverse("index"))
     else:
         return render(request, "network/register.html")
+
+@login_required(login_url='login')
+def following(request):
+    return render(request, "network/following.html")
+
+@login_required(login_url='login')
+def user(request):
+    return render(request, "network/user.html")
