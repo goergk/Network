@@ -8,7 +8,13 @@ from .models import *
 
 
 def index(request):
-    return render(request, "network/index.html")
+    posts = Post.objects.all()
+
+    return render(request, "network/index.html", {
+        "title": "All Posts",
+        "posts": posts,
+        "index": 'True'
+    })
 
 
 def login_view(request):
@@ -73,7 +79,9 @@ def register(request):
 
 @login_required(login_url='login')
 def following(request):
-    return render(request, "network/following.html")
+    return render(request, "network/index.html", {
+        "title": "Following"
+    })
 
 @login_required(login_url='login')
 def user(request):

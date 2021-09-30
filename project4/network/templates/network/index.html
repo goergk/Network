@@ -1,7 +1,43 @@
 {% extends "network/layout.html" %}
 
 {% block body %}
+    <div class="main_title_container">
+        <h3>
+            {{ title }}
+        </h3>
+    </div>
+
     <div class="content_container">
-        INDEX Page
+        {% if index %}
+            <div class="Post_container">
+                <h4>
+                    New Post
+                </h4>
+                <form id="post-form">
+                    <textarea class="form-control" id="post-textarea"></textarea>
+                    <input type="Submit" value="Post" class="btn btn-primary" style="margin-top: 10px;"/>
+                </form>
+            </div>
+        {% endif %}
+
+        {% for post in posts %}
+            <div class="Post_container">
+                <h5>
+                    {{ post.title }}
+                </h5>
+                {% if request.user == post.creator %}
+                    <a href="#">Edit</a>
+                {% endif %}
+                <p>
+                    {{ post.content }}
+                </p>
+                <p>
+                    {{ post.creation_date }}
+                </p>
+                <span>
+                    {{ post.likes.count }}
+                </span>
+            </div> 
+        {% endfor %}
     </div> 
 {% endblock %}

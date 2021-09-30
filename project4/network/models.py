@@ -15,4 +15,7 @@ class Post(models.Model):
     edit_date = models.DateTimeField(null=True, blank=True)
     likes = models.ManyToManyField(User, related_name="liked_posts", blank=True)
 
+    def __str__(self):
+        return f"{self.title} by {self.creator}"
+
 

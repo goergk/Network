@@ -1,7 +1,14 @@
 body {
   padding: 10px;
-  background-color: #f7f7f7;
   margin: 0px;
+}
+
+.main_title_container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f8f9fa;
+  width: 100%;
 }
 
 .body_container {
@@ -19,12 +26,8 @@ body {
   justify-content: center;
   align-items: center;
   width: 100%;
-  min-height: 75vh;
   margin-bottom: 50px;
   padding: 50px 0px 50px 0px;
-  box-shadow: 0px 30px 25px 0px rgba(0, 0, 0, 0.3);
-  -webkit-box-shadow: 0px 30px 25px 0px rgba(0, 0, 0, 0.3);
-  -moz-box-shadow: 0x 30px 25px 0px rgba(0, 0, 0, 0.3);
 }
 
 .login_container {
@@ -53,4 +56,18 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.Post_container {
+  width: 95%;
+  border: 1px solid #e0e0e0;
+  min-height: 200px;
+  border-radius: 5px;
+  margin-bottom: 15px;
+  padding: 25px;
+}
+
+#post-textarea {
+  height: 85px;
+  resize: none;
 }
