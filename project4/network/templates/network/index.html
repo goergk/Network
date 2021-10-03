@@ -1,4 +1,5 @@
 {% extends "network/layout.html" %}
+{% load static %}
 
 {% block body %}
     <div class="main_title_container">
@@ -8,7 +9,7 @@
     </div>
 
     <div class="content_container">
-        {% if index %}
+        {% if index and user.is_authenticated %}
             <div class="Post_container">
                 <h4>
                     New Post
@@ -18,7 +19,22 @@
                     <input type="Submit" value="Post" class="btn btn-primary" style="margin-top: 10px;"/>
                 </form>
             </div>
+        {% elif user_ == "True" %}
+            <div class="Post_container">
+                <h4>
+                    {{ requested_user.username }} profile
+                </h4>
+                <div class="container_1">
+                    <h6>{{ requested_user.followers.count }} Followers</h6>
+                    <h6>{{ requested_user.followings.count }} Followings</h6> 
+                    
+                    {% if user.is_authenticated and requested_user != request.user %}
+                        <a href="" id="follow">Follow</a>
+                    {% endif %}
+                </div>
+            </div>   
         {% endif %}
+
 
         {% for post in posts %}
             <div class="Post_container">
@@ -31,13 +47,37 @@
                 <p>
                     {{ post.content }}
                 </p>
-                <p>
-                    {{ post.creation_date }}
+                <p id="post_creation_date">
+                    {{ post.creation_date }} by <a href="{% url 'user' post.creator %}">{{ post.creator }}</a>
                 </p>
-                <span>
-                    {{ post.likes.count }}
-                </span>
+                {% if user.is_authenticated %}
+                <div class="likes_container" title="Like">  
+                    {% if liked_post == 'False' %} 
+                        <img src="{% static "network/like.svg" %}" alt="like" class="heart_icon">
+                    {% else %}
+                        <img src="{% static "network/unlike.svg" %}" alt="unlike" class="heart_icon">
+                    {% endif %}
+                    <span id="likes_counter">
+                        {{ post.likes.count }}
+                    </span>
+                </div>
+                {% else %}
+                    <div class="likes_container_disabled" title="Likes">
+                        {% if post.likes.count > 0 %}   
+                            <img src="{% static "network/unlike.svg" %}" alt="likes" class="heart_icon_disabled">
+                        {% else %}
+                            <img src="{% static "network/like.svg" %}" alt="likes" class="heart_icon_disabled">
+                        {% endif %}
+                        <span id="likes_counter">
+                            {{ post.likes.count }}
+                        </span>
+                    </div>
+                {% endif %}
             </div> 
         {% endfor %}
     </div> 
+{% endblock %}
+
+{% block script %}
+    <script src="{% static 'network/net.js' %}"></script>
 {% endblock %}

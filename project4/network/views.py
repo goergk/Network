@@ -10,10 +10,17 @@ from .models import *
 def index(request):
     posts = Post.objects.all()
 
+    try:
+        Post.objects.filter(likes=request.user)
+        liked_post='True'
+    except:
+        liked_post='False'
+
     return render(request, "network/index.html", {
         "title": "All Posts",
         "posts": posts,
-        "index": 'True'
+        "index": 'True',
+        "liked_post": liked_post
     })
 
 
@@ -83,6 +90,25 @@ def following(request):
         "title": "Following"
     })
 
-@login_required(login_url='login')
-def user(request):
-    return render(request, "network/user.html")
+def user(request, user):
+
+    posts = []
+    try:
+        print(f"{user}")        
+        posts = Post.objects.filter(creator__username=user)
+        user = User.objects.get(username=user)     
+        
+    except:
+        return render(request, "network/index.html", {
+            "title": "No Posts",
+            "posts": posts,
+            "user_": "True",
+            "requested_user": user
+        })
+
+    return render(request, "network/index.html", {
+        "title": f"{user} Posts",
+        "posts": posts,
+        "user_": "True",
+        "requested_user": user
+    })

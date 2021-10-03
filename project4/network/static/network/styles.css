@@ -71,3 +71,40 @@ body {
   height: 85px;
   resize: none;
 }
+
+#post_creation_date {
+  padding-top: 15px;
+  margin-bottom: 0;
+  color: gray;
+  font-weight: 500;
+}
+
+.likes_container,
+.likes_container_disabled {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  width: fit-content;
+}
+
+.likes_container:hover {
+  cursor: pointer;
+}
+
+#likes_counter {
+  font-size: 18px;
+  margin-left: 5px;
+}
+
+.heart_icon,
+.heart_icon_disabled {
+  height: 15px;
+}
+
+.container_1 {
+  display: flex;
+  flex-direction: column;
+  height: 6.5rem;
+  justify-content: flex-end;
+  align-items: flex-start;
+}
