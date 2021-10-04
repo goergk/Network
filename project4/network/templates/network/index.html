@@ -10,18 +10,21 @@
 
     <div class="content_container">
         {% if index and user.is_authenticated %}
-            <div class="Post_container">
+            <div class="Post_container_1">
                 <h4>
                     New Post
                 </h4>
-                <form id="post-form">
-                    <textarea class="form-control" id="post-textarea"></textarea>
+                <form id="post-form" method="POST" action="{% url 'newPost' %}">
+                    {% csrf_token %}
+                    {{post.topic}}
+                    {{post.content}}
                     <input type="Submit" value="Post" class="btn btn-primary" style="margin-top: 10px;"/>
                 </form>
             </div>
         {% elif user_ == "True" %}
-            <div class="Post_container">
+            <div class="Post_container_1">
                 <h4>
+                    <img src="{% static "network/User.svg" %}" alt="user" id="user_icon">
                     {{ requested_user.username }} profile
                 </h4>
                 <div class="container_1">
@@ -29,7 +32,12 @@
                     <h6>{{ requested_user.followings.count }} Followings</h6> 
                     
                     {% if user.is_authenticated and requested_user != request.user %}
-                        <a href="" id="follow">Follow</a>
+                        <div class="follows_container">
+                            <img src="{% static "network/Add.svg" %}" alt="follow" class="follow_icon">
+                            <a href="" id="follow">Follow</a>
+                            <!-- <img src="{% static "network/Delete.svg" %}" alt="unfollow" class="follow_icon">
+                            <a href="" id="follow">Unfollow</a> -->
+                        </div>        
                     {% endif %}
                 </div>
             </div>   

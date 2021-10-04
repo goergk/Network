@@ -8,7 +8,7 @@ function likes_counter() {
     document.querySelector('.heart_icon').alt = "unlike"
     document.querySelector('.heart_icon').src = "\/static\/network/unlike.svg"
     document.querySelector('.likes_container').title = "Unlike"
-  } else {
+  } else if (document.querySelector('.heart_icon').alt === "unlike"){
     document.querySelector('.heart_icon').alt = "like"
     document.querySelector('.heart_icon').src = "\/static\/network/like.svg"
     document.querySelector('.likes_container').title = "Like"

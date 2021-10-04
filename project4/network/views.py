@@ -3,9 +3,22 @@ from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
+from django import forms
 from django.contrib.auth.decorators import login_required
 from .models import *
 
+
+class NewPostForm(forms.Form):
+    topic = forms.CharField(widget=forms.Textarea(attrs={
+        'class': 'form-control',
+        'id': 'post-title', 
+        'placeholder': 'Topic'
+        }))
+    content = forms.CharField(widget=forms.Textarea(attrs={
+        'class': 'form-control',
+        'id': 'post-textarea', 
+        'placeholder': 'Content'
+        }))
 
 def index(request):
     posts = Post.objects.all()
@@ -20,7 +33,8 @@ def index(request):
         "title": "All Posts",
         "posts": posts,
         "index": 'True',
-        "liked_post": liked_post
+        "liked_post": liked_post,
+        "post": NewPostForm()
     })
 
 
@@ -93,8 +107,7 @@ def following(request):
 def user(request, user):
 
     posts = []
-    try:
-        print(f"{user}")        
+    try:      
         posts = Post.objects.filter(creator__username=user)
         user = User.objects.get(username=user)     
         
@@ -112,3 +125,17 @@ def user(request, user):
         "user_": "True",
         "requested_user": user
     })
+
+def newPost(request):
+    if request.method == "POST":
+        form = NewPostForm(request.POST)
+
+        if form.is_valid():
+            new_post = Post()
+            new_post.creator = request.user
+            new_post.title = form.cleaned_data["topic"]
+            new_post.content = form.cleaned_data["content"]
+            new_post.save()
+
+    return HttpResponseRedirect(reverse("index"))
+        
