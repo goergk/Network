@@ -107,6 +107,10 @@ body {
   cursor: pointer;
 }
 
+.follow_text:hover {
+  font-weight: 600;
+}
+
 #likes_counter {
   font-size: 18px;
   margin-left: 5px;

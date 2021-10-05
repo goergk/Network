@@ -25,18 +25,21 @@
             <div class="Post_container_1">
                 <h4>
                     <img src="{% static "network/User.svg" %}" alt="user" id="user_icon">
-                    {{ requested_user.username }} profile
+                    <span id="username">{{ requested_user.username }}</span> profile
                 </h4>
                 <div class="container_1">
-                    <h6>{{ requested_user.followers.count }} Followers</h6>
+                    <h6> <span id="followers_counter">{{ requested_user.followers.count }}</span> Followers</h6>
                     <h6>{{ requested_user.followings.count }} Followings</h6> 
                     
                     {% if user.is_authenticated and requested_user != request.user %}
                         <div class="follows_container">
-                            <img src="{% static "network/Add.svg" %}" alt="follow" class="follow_icon">
-                            <a href="" id="follow">Follow</a>
-                            <!-- <img src="{% static "network/Delete.svg" %}" alt="unfollow" class="follow_icon">
-                            <a href="" id="follow">Unfollow</a> -->
+                            {% if follow == 'True' %}
+                                <img src="{% static "network/unfollow.svg" %}" alt="unfollow" class="follow_icon">
+                                <span class="follow_text" style="color: red">Unfollow</span>                                
+                            {% else %}
+                                <img src="{% static "network/follow.svg" %}" alt="follow" class="follow_icon">
+                                <span class="follow_text" style="color: green">Follow</span>
+                            {% endif %}
                         </div>        
                     {% endif %}
                 </div>

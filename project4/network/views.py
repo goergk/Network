@@ -1,10 +1,11 @@
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
 from django import forms
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
 from .models import *
 
 
@@ -31,7 +32,7 @@ def index(request):
 
     return render(request, "network/index.html", {
         "title": "All Posts",
-        "posts": posts,
+        "posts": reversed(posts),
         "index": 'True',
         "liked_post": liked_post,
         "post": NewPostForm()
@@ -106,6 +107,18 @@ def following(request):
 
 def user(request, user):
 
+    profile_owner = User.objects.get(username=user)
+    owner_followers = []
+    follow = ''
+
+    try:
+        followers = profile_owner.followers.all()
+    except:
+        print('No followers')
+    
+    if request.user in followers:
+        follow = 'True'
+
     posts = []
     try:      
         posts = Post.objects.filter(creator__username=user)
@@ -114,16 +127,18 @@ def user(request, user):
     except:
         return render(request, "network/index.html", {
             "title": "No Posts",
-            "posts": posts,
+            "posts": reversed(posts),
             "user_": "True",
-            "requested_user": user
+            "requested_user": user,
+            'follow': follow
         })
 
     return render(request, "network/index.html", {
         "title": f"{user} Posts",
-        "posts": posts,
+        "posts": reversed(posts),
         "user_": "True",
-        "requested_user": user
+        "requested_user": user,
+        'follow': follow
     })
 
 def newPost(request):
@@ -138,4 +153,29 @@ def newPost(request):
             new_post.save()
 
     return HttpResponseRedirect(reverse("index"))
+
+@csrf_exempt
+def follow(request, user):
+    if request.method == "PUT":
+        user_to_follow = User.objects.get(username=user)
+        user = request.user
+        followers = []
+        try:
+            followers = user_to_follow.followers.all()
+        except:
+            print('No followers')
         
+        if user not in followers:
+            user_to_follow.followers.add(user)
+            user.followings.add(user_to_follow)
+        else:
+            user_to_follow.followers.remove(user)
+            user.followings.remove(user_to_follow)
+
+        return HttpResponse(status=204)
+
+    # Email must be via GET or PUT
+    else:
+        return JsonResponse({
+            "error": "PUT request required."
+        }, status=400)
