@@ -24,7 +24,8 @@ function followOrUnfollow_user() {
   followers = document.querySelector('#followers_counter').textContent;
 
   fetch(user+'/follow', {
-    method: 'PUT'
+    method: 'PUT',
+    credentials: 'include'
   })
   .then(response => {
     if (!response.ok) {

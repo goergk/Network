@@ -37,8 +37,7 @@ def index(request):
         "liked_post": liked_post,
         "post": NewPostForm()
     })
-
-
+ 
 def login_view(request):
     next_page = None
     try:
@@ -67,11 +66,9 @@ def login_view(request):
     else:
         return render(request, "network/login.html")
 
-
 def logout_view(request):
     logout(request)
     return HttpResponseRedirect(reverse("index"))
-
 
 def register(request):
     if request.method == "POST":
@@ -101,8 +98,24 @@ def register(request):
 
 @login_required(login_url='login')
 def following(request):
+
+    user = request.user
+    followings = []
+    posts = Post.objects.none()
+
+    try:
+        followings = user.followings.all()
+    except:
+        followings = ''
+
+    if followings:
+        for user in followings:
+            followings_posts = Post.objects.filter(creator__username=user)            
+            posts = posts | followings_posts
+
     return render(request, "network/index.html", {
-        "title": "Following"
+        "title": "Following",
+        "posts": posts.order_by('-creation_date')
     })
 
 def user(request, user):
