@@ -49,9 +49,10 @@
 
         {% for post in posts %}
             <div class="Post_container">
-                <h5>
+                <h5 class="post_title">
                     {{ post.title }}
                 </h5>
+                <span class="post_id" hidden>{{ post.id }}</span>
                 {% if request.user == post.creator %}
                     <a href="#">Edit</a>
                 {% endif %}
@@ -62,16 +63,22 @@
                     {{ post.creation_date }} by <a href="{% url 'user' post.creator %}">{{ post.creator }}</a>
                 </p>
                 {% if user.is_authenticated %}
-                <div class="likes_container" title="Like">  
-                    {% if liked_post == 'False' %} 
-                        <img src="{% static "network/like.svg" %}" alt="like" class="heart_icon">
+                    <div class="likes_container" 
+                    {% if post in liked_posts %}
+                        title="Unlike"
                     {% else %}
-                        <img src="{% static "network/unlike.svg" %}" alt="unlike" class="heart_icon">
+                        title="Like"
                     {% endif %}
-                    <span id="likes_counter">
-                        {{ post.likes.count }}
-                    </span>
-                </div>
+                    > 
+                        {% if post in liked_posts %} 
+                            <img src="{% static "network/unlike.svg" %}" alt="unlike" class="heart_icon">
+                        {% else %}
+                            <img src="{% static "network/like.svg" %}" alt="like" class="heart_icon">                        
+                        {% endif %}
+                        <span id="likes_counter">
+                            {{ post.likes.count }}
+                        </span>
+                    </div>
                 {% else %}
                     <div class="likes_container_disabled" title="Likes">
                         {% if post.likes.count > 0 %}   

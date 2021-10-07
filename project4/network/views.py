@@ -23,18 +23,18 @@ class NewPostForm(forms.Form):
 
 def index(request):
     posts = Post.objects.all()
+    liked_posts = []
 
     try:
-        Post.objects.filter(likes=request.user)
-        liked_post='True'
+        liked_posts = Post.objects.filter(likes=request.user)
     except:
-        liked_post='False'
+        print('No liked posts')
 
     return render(request, "network/index.html", {
         "title": "All Posts",
         "posts": reversed(posts),
         "index": 'True',
-        "liked_post": liked_post,
+        "liked_posts": liked_posts,
         "post": NewPostForm()
     })
  
@@ -102,6 +102,12 @@ def following(request):
     user = request.user
     followings = []
     posts = Post.objects.none()
+    liked_posts = []
+
+    try:
+        liked_posts = Post.objects.filter(likes=request.user)
+    except:
+        print('No liked posts')
 
     try:
         followings = user.followings.all()
@@ -115,14 +121,21 @@ def following(request):
 
     return render(request, "network/index.html", {
         "title": "Following",
-        "posts": posts.order_by('-creation_date')
+        "posts": posts.order_by('-creation_date'),
+        "liked_posts": liked_posts
     })
 
 def user(request, user):
 
     profile_owner = User.objects.get(username=user)
+    liked_posts = []
     owner_followers = []
-    follow = ''
+    follow = ''  
+
+    try:
+        liked_posts = Post.objects.filter(likes=request.user)
+    except:
+        print('No liked posts')
 
     try:
         followers = profile_owner.followers.all()
@@ -140,18 +153,20 @@ def user(request, user):
     except:
         return render(request, "network/index.html", {
             "title": "No Posts",
-            "posts": reversed(posts),
+            "posts": posts.order_by('-creation_date'),
             "user_": "True",
             "requested_user": user,
-            'follow': follow
+            'follow': follow,
+            "liked_posts": liked_posts
         })
 
     return render(request, "network/index.html", {
         "title": f"{user} Posts",
-        "posts": reversed(posts),
+        "posts": posts.order_by('-creation_date'),
         "user_": "True",
         "requested_user": user,
-        'follow': follow
+        'follow': follow,
+        "liked_posts": liked_posts
     })
 
 def newPost(request):
@@ -187,7 +202,31 @@ def follow(request, user):
 
         return HttpResponse(status=204)
 
-    # Email must be via GET or PUT
+    # Follow must be via PUT
+    else:
+        return JsonResponse({
+            "error": "PUT request required."
+        }, status=400)
+
+@csrf_exempt
+def like(request, post_id):
+    if request.method == "PUT":
+        post_to_follow = Post.objects.get(id=post_id)
+        user = request.user
+        likes = []
+        try:
+            likes = post_to_follow.likes.all()
+        except:
+            print('No likes')
+        
+        if user not in likes:
+            post_to_follow.likes.add(user)
+        else:
+            post_to_follow.likes.remove(user)
+
+        return HttpResponse(status=204)
+
+    # Like must be via PUT
     else:
         return JsonResponse({
             "error": "PUT request required."

@@ -1,21 +1,62 @@
 document.addEventListener('DOMContentLoaded', function() {
 
-    document.querySelector('.likes_container').addEventListener('click', () => likes_counter());
+    try{
+      const elements = document.querySelectorAll('.likes_container');
+
+      elements.forEach(element => {
+        element.addEventListener('click', (e) => LikeOrUnlike_user(element)
+        );
+      });
+    }catch(e){}
+
     try{
       document.querySelector('.follows_container').addEventListener('click', () => followOrUnfollow_user());
     }catch(e){}
   });
 
-function likes_counter() {
-  if (document.querySelector('.heart_icon').alt === "like"){
-    document.querySelector('.heart_icon').alt = "unlike"
-    document.querySelector('.heart_icon').src = "\/static\/network/unlike.svg"
-    document.querySelector('.likes_container').title = "Unlike"
-  } else if (document.querySelector('.heart_icon').alt === "unlike"){
-    document.querySelector('.heart_icon').alt = "like"
-    document.querySelector('.heart_icon').src = "\/static\/network/like.svg"
-    document.querySelector('.likes_container').title = "Like"
+function LikeOrUnlike_user(element) {
+
+  parentDiv = element.parentNode
+  post_id = parentDiv.querySelector('.post_id').textContent;
+  likes = element.querySelector('#likes_counter').textContent;
+  currentUrl = window.location.href
+  fetchURL = ''
+
+  if (currentUrl.includes("/user")){
+    // Handling likes on user profile page
+    fetchURL = '/post/like/'+post_id
+
+  } else{
+    // Handling likes on index page
+    fetchURL = 'post/like/'+post_id
+
   }
+
+  fetch(fetchURL, {
+    method: 'PUT'
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Something went wrong');
+    } else {
+      if (element.querySelector('.heart_icon').alt === "like"){
+        element.querySelector('.heart_icon').alt = "unlike"
+        element.querySelector('.heart_icon').src = "\/static\/network/unlike.svg"
+        element.title = "Unlike"
+
+        likes = parseInt(likes) + 1
+        element.querySelector('#likes_counter').textContent = likes
+
+      } else if (element.querySelector('.heart_icon').alt === "unlike"){
+        element.querySelector('.heart_icon').alt = "like"
+        element.querySelector('.heart_icon').src = "\/static\/network/like.svg"
+        element.title = "Like"
+
+        likes = parseInt(likes) - 1
+        element.querySelector('#likes_counter').textContent = likes
+      }
+    }
+  })
 }
 
 function followOrUnfollow_user() {
