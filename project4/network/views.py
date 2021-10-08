@@ -1,3 +1,4 @@
+import json
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
@@ -7,18 +8,19 @@ from django import forms
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from .models import *
+from datetime import datetime
 
 
 class NewPostForm(forms.Form):
     topic = forms.CharField(widget=forms.Textarea(attrs={
         'class': 'form-control',
         'id': 'post-title', 
-        'placeholder': 'Topic'
+        'placeholder': 'Topic',
         }))
     content = forms.CharField(widget=forms.Textarea(attrs={
         'class': 'form-control',
         'id': 'post-textarea', 
-        'placeholder': 'Content'
+        'placeholder': 'Content',
         }))
 
 def index(request):
@@ -35,7 +37,7 @@ def index(request):
         "posts": reversed(posts),
         "index": 'True',
         "liked_posts": liked_posts,
-        "post": NewPostForm()
+        "postForm": NewPostForm()
     })
  
 def login_view(request):
@@ -184,6 +186,12 @@ def newPost(request):
 
 @csrf_exempt
 def follow(request, user):
+
+    if not request.user.is_authenticated:
+        return JsonResponse({
+            "error": "You have to be logged in."
+        }, status=400)
+
     if request.method == "PUT":
         user_to_follow = User.objects.get(username=user)
         user = request.user
@@ -210,6 +218,12 @@ def follow(request, user):
 
 @csrf_exempt
 def like(request, post_id):
+
+    if not request.user.is_authenticated:
+        return JsonResponse({
+            "error": "You have to be logged in."
+        }, status=400)
+
     if request.method == "PUT":
         post_to_follow = Post.objects.get(id=post_id)
         user = request.user
@@ -223,6 +237,33 @@ def like(request, post_id):
             post_to_follow.likes.add(user)
         else:
             post_to_follow.likes.remove(user)
+
+        return HttpResponse(status=204)
+
+    # Like must be via PUT
+    else:
+        return JsonResponse({
+            "error": "PUT request required."
+        }, status=400)
+
+@csrf_exempt
+def edit(request, post_id):
+
+    if not request.user.is_authenticated:
+        return JsonResponse({
+            "error": "You have to be logged in."
+        }, status=400)
+
+    if request.method == "PUT":
+        post_to_edit = Post.objects.get(id=post_id)
+            
+        data = json.loads(request.body)
+        if data.get("title") is not None:
+            post_to_edit.title = data["title"]
+        if data.get("content") is not None:
+            post_to_edit.content = data["content"]
+        post_to_edit.edit_date = datetime.now()
+        post_to_edit.save()
 
         return HttpResponse(status=204)
 

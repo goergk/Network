@@ -3,6 +3,14 @@ body {
   margin: 0px;
 }
 
+.unselectable {
+  -moz-user-select: -moz-none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+}
+
 .main_title_container {
   display: flex;
   justify-content: center;
@@ -94,6 +102,12 @@ body {
   font-weight: 500;
 }
 
+#post_edit_date {
+  font-size: 14px;
+  color: gray;
+  margin-bottom: 0;
+}
+
 .likes_container,
 .likes_container_disabled {
   display: flex;
@@ -132,4 +146,14 @@ body {
   height: 6.5rem;
   justify-content: flex-end;
   align-items: flex-start;
+}
+
+.edit_post {
+  font-weight: 700;
+  color: #007bff;
+}
+
+.edit_post:hover {
+  cursor: pointer;
+  color: black;
 }

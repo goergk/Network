@@ -12,6 +12,15 @@ document.addEventListener('DOMContentLoaded', function() {
     try{
       document.querySelector('.follows_container').addEventListener('click', () => followOrUnfollow_user());
     }catch(e){}
+
+    try{
+      const edit_elements = document.querySelectorAll('.edit_post');
+
+      edit_elements.forEach(element => {
+        element.addEventListener('click', (e) => Edit_post(element)
+        );
+      });
+    }catch(e){}
   });
 
 function LikeOrUnlike_user(element) {
@@ -94,3 +103,51 @@ function followOrUnfollow_user() {
     }
   })
 }
+
+function Edit_post(element) {
+
+  showPostDiv = element.parentNode
+  mainPostContainer = showPostDiv.parentNode
+  editPostDiv = mainPostContainer.querySelector('.Edit_post_container')
+
+  post_title = showPostDiv.querySelector('.post_title').innerText
+  post_content = showPostDiv.querySelector('.post_content').innerText
+  post_id = showPostDiv.querySelector('.post_id').innerText
+
+  showPostDiv.style.display = 'none'
+  editPostDiv.style.display = 'block'
+  
+  post_title_form = editPostDiv.querySelector('#post-title')
+  post_content_form = editPostDiv.querySelector('#post-textarea')
+  post_title_form.value = post_title
+  post_content_form.value = post_content
+
+  save_button = editPostDiv.querySelector('.btn')
+  save_button.addEventListener('click', (event) => {
+    event.preventDefault()
+
+    title_value = post_title_form.value
+    content_value = post_content_form.value
+
+    fetch('/edit/'+post_id, {
+      method: 'PUT',
+      body: JSON.stringify({
+          title: title_value,
+          content: content_value
+      })
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Something went wrong');
+      } else {
+        editPostDiv.style.display = 'none' 
+        showPostDiv.querySelector('#post_edit_date').style.display = "block"
+        showPostDiv.style.display = 'block'
+        showPostDiv.querySelector('.post_title').innerText = title_value
+        showPostDiv.querySelector('.post_content').innerText = content_value
+        const d = new Date()
+        showPostDiv.querySelector('#post_edit_date').innerText = 'Edited: '+d.toUTCString();
+
+      }});
+  })
+}    
