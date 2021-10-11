@@ -9,6 +9,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from .models import *
 from datetime import datetime
+from django.core.paginator import Paginator
 
 
 class NewPostForm(forms.Form):
@@ -27,6 +28,11 @@ def index(request):
     posts = Post.objects.all()
     liked_posts = []
 
+    posts = posts.order_by('-creation_date')
+    paginator = Paginator(posts, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
     try:
         liked_posts = Post.objects.filter(likes=request.user)
     except:
@@ -34,10 +40,12 @@ def index(request):
 
     return render(request, "network/index.html", {
         "title": "All Posts",
-        "posts": reversed(posts),
+        "posts": posts,
         "index": 'True',
         "liked_posts": liked_posts,
-        "postForm": NewPostForm()
+        "postForm": NewPostForm(),
+        "page_obj": page_obj,
+        "range": range(page_obj.paginator.num_pages)
     })
  
 def login_view(request):
@@ -121,10 +129,17 @@ def following(request):
             followings_posts = Post.objects.filter(creator__username=user)            
             posts = posts | followings_posts
 
+    posts = posts.order_by('-creation_date')
+    paginator = Paginator(posts, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
     return render(request, "network/index.html", {
         "title": "Following",
-        "posts": posts.order_by('-creation_date'),
-        "liked_posts": liked_posts
+        "posts": posts,
+        "liked_posts": liked_posts,
+        "page_obj": page_obj,
+        "range": range(page_obj.paginator.num_pages)
     })
 
 def user(request, user):
@@ -150,12 +165,16 @@ def user(request, user):
     posts = []
     try:      
         posts = Post.objects.filter(creator__username=user)
-        user = User.objects.get(username=user)     
+        user = User.objects.get(username=user)
+        posts = posts.order_by('-creation_date')
+        paginator = Paginator(posts, 10)
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)     
         
     except:
         return render(request, "network/index.html", {
             "title": "No Posts",
-            "posts": posts.order_by('-creation_date'),
+            "posts": posts,
             "user_": "True",
             "requested_user": user,
             'follow': follow,
@@ -168,7 +187,9 @@ def user(request, user):
         "user_": "True",
         "requested_user": user,
         'follow': follow,
-        "liked_posts": liked_posts
+        "liked_posts": liked_posts,
+        "page_obj": page_obj,
+        "range": range(page_obj.paginator.num_pages)
     })
 
 def newPost(request):

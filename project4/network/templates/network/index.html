@@ -47,7 +47,7 @@
         {% endif %}
 
 
-        {% for post in posts %}
+        {% for post in page_obj %}
             <div class="Post_container">
                 <div class="Show_post_container">
                     <h5 class="post_title">
@@ -110,7 +110,32 @@
                 </div>
             </div> 
         {% endfor %}
-    </div> 
+    </div>
+    
+    <div id="paginator">
+        <ul class="pagination">
+            {% if page_obj.has_previous %}
+                <li class="page-item"><a class="page-link" href="?page=1">&laquo; first</a></li>
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">previous</a></li>
+            {% endif %}
+            
+            {% for i in range %}
+                <li 
+                {% if i|add:1 == page_obj.number %}
+                    class="page-item active"
+                {% else %}
+                    class="page-item"
+                {% endif %}
+                ><a class="page-link" href="?page={{ i|add:1 }}">{{ i|add:1 }}</a></li>
+            {% endfor %}
+    
+            {% if page_obj.has_next %}
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">next</a></li>
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">last  &raquo;</a></li>
+            {% endif %}
+        </ul>
+    </div>   
+
 {% endblock %}
 
 {% block script %}

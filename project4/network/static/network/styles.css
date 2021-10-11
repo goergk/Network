@@ -157,3 +157,12 @@ body {
   cursor: pointer;
   color: black;
 }
+
+#paginator {
+  width: 95%;
+  display: flex;
+  justify-content: flex-end;
+  margin-top: -100px;
+  padding-top: 15px;
+  border-top: 1px solid #dedede;
+}
